@@ -1,0 +1,11 @@
+(1) Write a program to find the anti-complimentary sequence of an input DNA sequence. [2 marks]
+
+(2)Intrinsic terminators have two prominent structural features: (1) a sequence of nucleotides that includes an inverted
+repeat (i.e., the sequence 5'-CGGATG|CATCCG-3' contains an inverted repeat centered at the "|" because "5'-CGGATG-3"' reads "5'-CATCCG-3"' on its complementary strand), and (2) a run of roughly six uracils immediately following the inverted repeat.
+Write a function to identify intrinsic terminators from the sequence.	[5 marks]
+
+(3) Given DNA sequence, arrange the codons in the decreasing order of frquency. [3 marks]
+
+(4) Given two strings s and t of equal length, the Hamming distance between s and t, denoted dH(s,t), is the number of corresponding symbols that differ in s and t. Write a function to compute dH(s,t)	[4 marks]
+
+(5)  Given Two protein strings s and t in FASTA format (each of length at most 100 aa), write a program to find the optimal global alignment score (use match score, mismatch and gap penalties as variables)	[10 marks]
