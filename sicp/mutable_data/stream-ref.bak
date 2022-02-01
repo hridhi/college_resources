@@ -1,0 +1,6 @@
+#lang racket
+(require racket/stream)
+(define (stream-ref s n)
+	(if (= n 0)
+		(stream-first s)
+		(stream-ref (stream-rest s) (- n 1))))

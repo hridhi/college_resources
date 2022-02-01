@@ -1,0 +1,9 @@
+#lang sicp
+(define mylist (list 'a 'b 'c 'd))
+mylist
+(set-car! mylist 1)
+mylist
+;(set-cdr! mylist 4)
+(define (mypair (cons 4 '())))
+(set-cdr! (cddr mylist) 4)
+mylist
