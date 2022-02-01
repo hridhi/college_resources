@@ -1,0 +1,235 @@
+#lang racket
+
+;############################################################ Matrix creation ####################################################
+
+(define (creatematrix r c )
+  (define mat '())
+  (for ([i (in-range 0 r)])
+    (define temp '())
+    (for ([j (in-range 0 c)])
+      (define a (read-line (current-input-port) 'any))
+      (set! temp (append temp (list (string->number a))))
+      )
+    (display temp)
+    (if (null? mat)
+        (set! mat (list temp))
+            (set! mat (append mat (list temp))))
+    (display mat)
+     )
+  mat )
+
+;############################################################ helpers ####################################################
+(define (access-row matrix x)
+(define fla '())
+(define w 0)
+(for/list ([row matrix] [i (length matrix)])
+(for/list ([e row] [j (length row)])
+(if (= x i)
+    (if (null? fla)
+        (set! fla (list e))
+        (append fla e))
+(+ w 1) )))fla)
+
+
+(define (change-at-row l x y )
+  (for/list ([row l] [i (length l)])
+    (for/list ([e row] [j (length row)])
+      (if (= x i)
+          (- e (access-elem l y j))
+          e))))
+
+(define (change-at l x y to)
+  (for/list ([row l] [i (length l)])
+    (for/list ([e row] [j (length row)])
+      (if (and (= x i) (= y j))
+          to
+          e))))
+
+(define (multiply l r val)
+  (for/list ([row l] [i (length l)])
+    (for/list ([e row] [j (length row)])
+      (if (= i r)
+          (* val e)
+          e))))
+
+(define (access-elem l x y)
+(define fla 0)
+(define w 0)
+(for/list ([row l] [i (length l)])
+(for/list ([e row] [j (length row)])
+(if (and (= x i) (= y j))
+(set! fla e)
+(+ w 1) )))fla)
+
+
+ (define (find-index pred l)
+    (let loop ((index 0) (l l))
+      (cond ((null? l) #f)
+            ((pred (car l)) index)
+            (else (loop (add1 index) (cdr l))))))
+
+(define (swap l i1 i2)
+    (let loop ((l l) (i1 (min i1 i2)) (i2 (max i1 i2)))
+      (if (= 0 i1)
+        (cons (list-ref l i2)
+              (replace-index (cdr l) (sub1 i2) (car l)))
+        (cons (car l)
+              (loop (cdr l) (sub1 i1) (sub1 i2))))))
+
+  (define (replace-index l i v)
+    (if (= i 0)
+      (cons v (cdr l))
+      (cons (car l) (replace-index (cdr l) (add1 i) v))))
+(define (gaussian-submatrix m)
+    (let ((first-row (car m)))
+      (map (lambda (row)
+             (let ((mult (/ (car row)
+                            (car first-row))))
+               (map (lambda (above current)
+                      (- current (* mult above)))
+                    (cdr first-row)
+                    (cdr row))))
+           (cdr m))))
+
+(define (rows matrix)
+  (length matrix))
+
+(define (col matrix)
+   (length (car matrix)))
+
+;############################################################ addition ####################################################
+
+(define (addmatrix matrix1 matrix2)
+  (if (and (= (rows matrix1) (rows matrix2)) (=(col matrix1) (col matrix2)))
+      (map (lambda (matrix1 matrix2) (map + matrix1 matrix2)) matrix1 matrix2)
+      (display "Dimensions do not match")))
+
+;############################################################ substraction ####################################################
+
+(define (submatrix matrix1 matrix2)
+  (if (and (= (rows matrix1) (rows matrix2)) (=(col matrix1) (col matrix2)))
+      (map (lambda (matrix1 matrix2) (map - matrix1 matrix2)) matrix1 matrix2)
+      (display "Dimensions do not match")))
+
+;############################################################ multiplication ####################################################
+
+(define (matrixmult matrix1 matrix2)
+  (if (= (col matrix1)(rows matrix2))
+       (map(lambda (row)
+        (apply map
+       (lambda column
+         (apply + (map * row column)))
+       matrix2))
+   matrix1)
+      (display "error")))
+
+;############################################################ transpose ####################################################
+
+(define (transpose matrix)                    
+  (for/list ((i (length (list-ref matrix 0)))) 
+    (for/list ((il matrix))                    
+      (list-ref il i))))
+
+;############################################################ determinant ####################################################
+
+(define (det m)
+    (let ((index (find-index (lambda (r) (not (= 0 (car r)))) m)))
+      (if (not index)
+        0
+        (let ((swap-multiplier (if (= index 0) 1 -1))
+              (m-swapped (if (= index 0) m (swap m 0 index))))
+          (let ((submatrix (gaussian-submatrix m-swapped)))
+            (if (null? submatrix)
+              (caar m-swapped)
+              (* swap-multiplier
+                 (caar m-swapped)
+                 (det submatrix))))))))
+
+;############################################################ extract diagonal elements ####################################################
+
+(define (diagonal matrix)
+  (if (null? matrix)
+      '()
+      (cons (caar matrix)
+            (diagonal (map cdr (cdr matrix))))))
+
+;############################################################ identifying upper triangle matrix ####################################################
+
+(define (upper matrix)
+   (define count (rows matrix))
+  (if (= (rows matrix) (col matrix))
+ 
+  (for ([i (in-range 0 (rows matrix))])
+    (for ([j (in-range 0 (- (rows matrix) count))])
+       (set! matrix (change-at matrix i j 0))
+    )
+    (set! count (- count 1))
+    (display matrix)
+    )
+  (display "not a square matrix")))
+
+;############################################################ identifying lower triangle matrix ####################################################
+
+(define (lower matrix)
+   (define count 1)
+  (if (= (rows matrix) (col matrix))
+  (for ([i (in-range 0 (rows matrix))])
+    (for ([j (in-range count (rows matrix))])
+       (set! matrix (change-at matrix i j 0))
+    )
+    (set! count (+ count 1))
+    (display matrix)
+    )
+  (display "not a square matrix")))
+
+;############################################################ rank of matrix ####################################################
+
+(define (rank matrix)
+  (define lead 0)
+  (define rowCount (rows matrix))
+  (define colCount (col matrix))
+  (for ([r (in-range 0 rowCount)])
+    (if (and (= colCount lead) (< colCount lead))
+        (display "end")
+        (break))
+    (define i r )
+    (while (=  (access-elem matrix i lead) 0);access element ---done
+           (+ i 1)
+            (if (= rowCount i )
+                ((set! i r)
+                 (+ lead 1)
+                 (if (= colCount i)
+                     (display "end")
+                     (break))
+                 )
+                (break))
+            )
+    ;swap row i and r
+    (define rowi (access-row matrix i)); extracted rows -- done
+    (define rowr (access-row matrix r))
+    
+    (if (!= (access-elem matrix r lead) 0) ; access ele--done
+        (define val (access-elem matrix r lead))
+       (set! matrix (divide matrix r val)) ; divide by m[r,lead]--done
+        )
+    (for ([i (in-range 0 rowCount)])
+      (if (! i r)
+          (set! matrix (multiply matrix r val))
+           (set! matrix (change-at-row matrix i r))
+          ; sub (x multiplied by row r ) from row i---done
+          ; substract elements in row i by row r --done
+          (break)
+          )
+      )
+    (+ lead 1)
+    ))
+
+;############################################################ inverse of matrix ####################################################
+
+
+
+;############################################################ execution ####################################################
+
+;(define x (creatematrix 3 3))
+;(define y (creatematrix 2 3))
+;(addmatrix x y)

@@ -1,0 +1,16 @@
+#lang racket
+(require br/verbose-app)
+(define (pair x y) 
+  (define (dispatch m)
+	(cond ((= m 0) x) 
+	      ((= m 1) y) 
+	(else (error "Argument not 0 or 1")))
+    ) 
+dispatch)
+
+;(define (first p)  (p 0))
+;(define (second p) (p 1))
+
+;(first (pair 3 4))
+;(second (pair 3 4))
+

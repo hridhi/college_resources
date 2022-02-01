@@ -1,0 +1,21 @@
+#lang racket
+(define (rows matrix)
+  (length matrix))
+
+(define (col matrix)
+   (length (car matrix)))
+(define matrix-upper-triangle
+  (case-lambda
+    [(M)  (matrix-upper-triangle M 0)]
+    [(M zero)
+     (define m (rows M))
+     (define n (col M ))
+    ; (define-values (m n) (matrix-shape M))
+     (define proc (unsafe-array-proc M))
+     (array-default-strict
+      (unsafe-build-array
+       ((inst vector Index) m n)
+       (λ: ([ij : Indexes])
+         (define i (unsafe-vector-ref ij 0))
+         (define j (unsafe-vector-ref ij 1))
+         (if (i . fx<= . j) (proc ij) zero))))]))

@@ -1,0 +1,2 @@
+#lang racket
+(define u (const 2 3))
